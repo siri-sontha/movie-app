@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
+import { useDebounce } from 'react-use'
 import Search from './components/Search'
 import Spinner from './components/Spinner'
 import MovieCard from './components/MovieCard'
+import SearchSuggestions from './components/SearchSuggestions'
 
 const API_BASE_URL = 'https://api.themoviedb.org/3'
 
@@ -21,14 +23,19 @@ export default function App() {
     const [errorMsg, setErrorMsg] = useState('')
     const [movies, setMovies] = useState([])
     const [isLoading, setIsLoading] = useState(false)
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
 
-    const fetchMovies = async () => {
+    useDebounce(() => setDebouncedSearchTerm(searchTerm), 500, [searchTerm])
+
+    const fetchMovies = async (query = '') => {
 
         setIsLoading(true)
         setErrorMsg('')
 
     try {
-        const endpoint = `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`
+        const endpoint = query 
+        ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
+        : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`
 
         const response = await fetch(endpoint, API_OPTIONS)
 
@@ -56,10 +63,10 @@ export default function App() {
 }
 
     useEffect(() => {
-        fetchMovies()
-    }, [])
-    
+        fetchMovies(debouncedSearchTerm)
+    }, [debouncedSearchTerm])
 
+    
   return (
     <main>
         <div className="pattern" />
@@ -70,6 +77,9 @@ export default function App() {
                 <h1>Find <span className="text-gradient">Movies</span> you'll enjoy without the hassle</h1>
             
                 <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+                {searchTerm && movies.slice(0, 9).map((movie) => (
+                <SearchSuggestions key={movie.id} title={movie.title} onClick={() => setSearchTerm(movie.title)} />
+                ))}
             </header>
 
             <section className="all-movies">

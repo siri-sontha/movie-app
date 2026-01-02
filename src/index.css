@@ -78,7 +78,7 @@
   }
 
   .search {
-    @apply w-full bg-light-100/5 px-4 py-3 rounded-lg mt-10 max-w-3xl mx-auto;
+    @apply w-full bg-light-100/5 px-4 py-3 rounded-lg mt-10 mb-10 max-w-3xl mx-auto;
 
     & div {
       @apply relative flex items-center;
@@ -90,6 +90,14 @@
 
     & input {
       @apply w-full bg-transparent py-2 sm:pr-10 pl-10 text-base text-gray-200 placeholder-light-200 outline-hidden;
+    }
+  }
+
+  .searchSuggestions{
+    @apply w-full bg-light-100/5 px-4 py-3 max-w-3xl mx-auto;
+
+    & p {
+      @apply py-2 sm:pr-10 pl-10 text-base text-gray-200;
     }
   }
 
