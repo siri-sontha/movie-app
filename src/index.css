@@ -101,7 +101,7 @@
     }
   }
 
-  .all-movies {
+  .all-results {
     @apply space-y-9;
 
     & ul {

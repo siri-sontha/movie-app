@@ -13,7 +13,7 @@ export default function Search({ searchTerm, setSearchTerm }) {
                 <img src="search.svg" alt="search" />
 
                 <input type="text"
-                    placeholder="Search through thousands of movies"
+                    placeholder="Search through thousands of results"
                     value={searchTerm}
                     onChange={handleChange}
                 />

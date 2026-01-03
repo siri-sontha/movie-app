@@ -6,9 +6,7 @@ import MovieCard from './components/MovieCard'
 import SearchSuggestions from './components/SearchSuggestions'
 
 const API_BASE_URL = 'https://api.themoviedb.org/3'
-
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY
-
 const API_OPTIONS = {
     method: 'GET',
     headers: {
@@ -21,11 +19,35 @@ export default function App() {
 
     const [searchTerm, setSearchTerm] = useState('')
     const [errorMsg, setErrorMsg] = useState('')
-    const [movies, setMovies] = useState([])
+    const [results, setResults] = useState([])
     const [isLoading, setIsLoading] = useState(false)
-    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+    const [suggestions, setSuggestions] = useState([])
 
-    useDebounce(() => setDebouncedSearchTerm(searchTerm), 500, [searchTerm])
+    const fetchSuggestions = async (query = '') => {
+        if(!query.trim()) {
+            setSuggestions([])
+            return
+        }
+
+        try {
+            const endpoint = `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
+            const response = await fetch(endpoint, API_OPTIONS)
+
+            const data = await response.json()
+            setSuggestions((data.results || []).slice(0, 10))
+        }
+        catch {
+            setSuggestions([])
+        }
+    }
+
+    useDebounce(() => {fetchSuggestions(searchTerm)}, 400, [searchTerm])
+
+    const handleSuggestionClick = (title) => {
+        setSearchTerm(title)
+        setSuggestions([])
+        fetchMovies(title)
+    }
 
     const fetchMovies = async (query = '') => {
 
@@ -40,31 +62,23 @@ export default function App() {
         const response = await fetch(endpoint, API_OPTIONS)
 
         if(!response.ok) {
-            throw new Error('Error Occurred! Failed to fetch movies')
+            throw new Error('Error Occurred! Failed to fetch results')
         }
 
         const data = await response.json()
 
-        console.log(data)
-
-        if(data.response == 'False') {
-            setErrorMsg(data.Error || 'Fetch failure')
-            setMovies([])
-            return
-        }
-
-        setMovies(data.results || [])
+        setResults(data.results || [])
     }
     catch(error) {
-        setErrorMsg('There was an ERROR fetching movies. Please try again later.')
+        setErrorMsg('There was an ERROR fetching results. Please try again later.')
     } finally {
         setIsLoading(false)
     }
-}
+    }
 
     useEffect(() => {
-        fetchMovies(debouncedSearchTerm)
-    }, [debouncedSearchTerm])
+        fetchMovies()
+    }, [])
 
     
   return (
@@ -74,16 +88,16 @@ export default function App() {
         <div className="wrapper">
             <header>
                 <img src="./hero.png" alt="hero banner" />
-                <h1>Find <span className="text-gradient">Movies</span> you'll enjoy without the hassle</h1>
+                <h1>Find <span className="text-gradient">results</span> you'll enjoy without the hassle</h1>
             
                 <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-                {searchTerm && movies.slice(0, 9).map((movie) => (
-                <SearchSuggestions key={movie.id} title={movie.title} onClick={() => setSearchTerm(movie.title)} />
+                {searchTerm && suggestions.map((movie) => (
+                <SearchSuggestions key={movie.id} title={movie.title} onClick={() => handleSuggestionClick(movie.title)} />
                 ))}
             </header>
 
-            <section className="all-movies">
-                <h2 className="mt-[60px]">All Movies</h2>
+            <section className="all-results">
+                <h2 className="mt-[60px]">All results</h2>
 
                 {isLoading ? (
                     // Loader or Spinner
@@ -92,9 +106,9 @@ export default function App() {
                     // Error Message
                     <p className="text-red-500">{errorMsg}</p>
                 ) : (
-                    // Movies Data
+                    // results Data
                     <ul>
-                        {movies.map((movie) => (
+                        {results.map((movie) => (
                             <MovieCard key={movie.id} movie={movie} />
                         ))}
                     </ul>
