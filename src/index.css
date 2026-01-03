@@ -93,13 +93,27 @@
     }
   }
 
-  .searchSuggestions{
-    @apply w-full bg-light-100/5 px-4 py-3 max-w-3xl mx-auto;
+  .searchSuggestions {
+      @apply w-full max-w-3xl mx-auto bg-light-100/5 px-4 py-3;
 
-    & p {
-      @apply py-2 sm:pr-10 pl-10 text-base text-gray-200;
-    }
+      & div {
+          @apply relative flex items-center;
+      }
+
+      & img {
+          @apply absolute w-12 h-8 object-cover rounded flex-shrink-0;
+      }
+
+      & p {
+          @apply ml-16 text-left text-base text-gray-200;
+      }
+
+      &:hover, &:active {
+        @apply bg-light-100/20;
+      }
   }
+
+
 
   .all-results {
     @apply space-y-9;

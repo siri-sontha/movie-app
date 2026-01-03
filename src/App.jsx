@@ -34,7 +34,7 @@ export default function App() {
             const response = await fetch(endpoint, API_OPTIONS)
 
             const data = await response.json()
-            setSuggestions((data.results || []).slice(0, 10))
+            setSuggestions((data.results || []).slice(0, 9))
         }
         catch {
             setSuggestions([])
@@ -67,6 +67,8 @@ export default function App() {
 
         const data = await response.json()
 
+        console.log(data)
+
         setResults(data.results || [])
     }
     catch(error) {
@@ -91,8 +93,9 @@ export default function App() {
                 <h1>Find <span className="text-gradient">results</span> you'll enjoy without the hassle</h1>
             
                 <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-                {searchTerm && suggestions.map((movie) => (
-                <SearchSuggestions key={movie.id} title={movie.title} onClick={() => handleSuggestionClick(movie.title)} />
+                {searchTerm && suggestions.length > 0 && suggestions.map((movie) => (
+                <SearchSuggestions key={movie.id} title={movie.title} poster_path={movie.poster_path} 
+                                   onClick={() => handleSuggestionClick(movie.title)} />
                 ))}
             </header>
 
